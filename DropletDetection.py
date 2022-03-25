@@ -1,34 +1,26 @@
 import cv2
-import sys, os
 import numpy as np
 from tqdm import tqdm
 from PIL import Image, ImageEnhance
 from skimage.transform import hough_circle, hough_circle_peaks
 
-def main():
-    video = cv2.VideoCapture("./video1.mp4")
-    width, height = (int(video.get(cv2.CAP_PROP_FRAME_WIDTH)), int(video.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-
-    fourcc = cv2.VideoWriter_fourcc(*'H264')
-    detectedVideo = cv2.VideoWriter("./video1out.mp4", fourcc, 60, (width, height))
+def Analyze(filename, start=None, end=None):
+    video = cv2.VideoCapture(filename)
 
     for i in tqdm(range(300)):
         success, image = video.read()
-        try: im = DrawContours( DetectEdgesInfo(image), image)
-        except: print("Failed!")
-        detectedVideo.write(im)
+        DetectEdgesInfo(image) # Should implement radius calculation in the future.
 
-    detectedVideo.release()
     video.release()
-
-
 
 def DetectEdgesInfo(image):
     image = Image.fromarray(image).convert('L')
     image = PrepareImage(image)
     circles = FindCircles(image)
 
-    return circles
+    return sorted(circles[0], key=lambda x: x[0])
+
+    return circles[0][0]
 
 def PrepareImage(im):
     im = ImageEnhance.Brightness(im).enhance(5)
