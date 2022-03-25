@@ -1,9 +1,9 @@
+import cv2
+import sys, os
+import numpy as np
+from tqdm import tqdm
 from PIL import Image, ImageEnhance
 from skimage.transform import hough_circle, hough_circle_peaks
-from tqdm import tqdm
-import numpy as np
-import sys, os
-import cv2
 
 def main():
     video = cv2.VideoCapture("./video1.mp4")
@@ -21,17 +21,16 @@ def main():
     detectedVideo.release()
     video.release()
 
-def DrawContours(circles, output):
-    circles = np.round(circles[0, :]).astype("int")
 
-    for (x, y, r) in circles:
-        cv2.circle(output, (x, y), r, (90, 90, 90), 2)
-        cv2.circle(output, (x, y), r//2, (255, 255, 255), 2)
-    
 
-    return output
+def DetectEdgesInfo(image):
+    image = Image.fromarray(image).convert('L')
+    image = PrepareImage(image)
+    circles = FindCircles(image)
 
-def PreProcessImage(im):
+    return circles
+
+def PrepareImage(im):
     im = ImageEnhance.Brightness(im).enhance(5)
     im = ImageEnhance.Contrast(im).enhance(1.5)
     im = np.array( im )
@@ -45,11 +44,11 @@ def FindCircles(im):
 
     return circles
 
-def DetectEdgesInfo(image):
-    image = Image.fromarray(image).convert('L')
-    image = PreProcessImage(image)
-    circles = FindCircles(image)
+def DrawContours(circles, output):
+    circles = np.round(circles[0, :]).astype("int")
 
-    return circles
-
-main()
+    for (x, y, r) in circles:
+        cv2.circle(output, (x, y), r, (90, 90, 90), 2)
+        cv2.circle(output, (x, y), r//2, (255, 255, 255), 2)
+    
+    return output

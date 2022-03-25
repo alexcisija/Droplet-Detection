@@ -1,9 +1,7 @@
 import math
 
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.Qt import *
+from PyQt5.QtWidgets import QMainWindow
+from PyQt5 import QtCore, QtGui
 
 from Ui_VideoAnalysis import Ui_VideoAnalysis
 
