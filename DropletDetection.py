@@ -7,9 +7,13 @@ from skimage.transform import hough_circle, hough_circle_peaks
 def Analyze(filename, start=None, end=None):
     video = cv2.VideoCapture(filename)
 
-    for i in tqdm(range(300)):
-        success, image = video.read()
-        DetectEdgesInfo(image) # Should implement radius calculation in the future.
+    with open("./output.csv", 'w+') as f:
+        for i in tqdm(range(start, end)):
+            success, image = video.read()
+            circles = DetectEdgesInfo(image) # Should implement radius calculation in the future.
+            
+            for circle in circles: f.write(f"{circle[2]}, ")
+            f.write("\n")
 
     video.release()
 
@@ -19,8 +23,6 @@ def DetectEdgesInfo(image):
     circles = FindCircles(image)
 
     return sorted(circles[0], key=lambda x: x[0])
-
-    return circles[0][0]
 
 def PrepareImage(im):
     im = ImageEnhance.Brightness(im).enhance(5)
@@ -37,7 +39,7 @@ def FindCircles(im):
     return circles
 
 def DrawContours(circles, output):
-    circles = np.round(circles[0, :]).astype("int")
+    circles = np.round(circles).astype("int")
 
     for (x, y, r) in circles:
         cv2.circle(output, (x, y), r, (90, 90, 90), 2)
