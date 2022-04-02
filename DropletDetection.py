@@ -42,7 +42,7 @@ def DrawContours(circles, output):
     circles = np.round(circles).astype("int")
 
     for (x, y, r) in circles:
-        cv2.circle(output, (x, y), r, (90, 90, 90), 2)
+        cv2.circle(output, (x, y), r, (140, 140, 140), 2)
         cv2.circle(output, (x, y), r//2, (255, 255, 255), 2)
     
     return output

@@ -1,13 +1,13 @@
 import sys, cv2
 
-import DropletDetection
-import numpy as np
-from PyQt5.QtWidgets import QSlider, QMainWindow, QGridLayout, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QPushButton
+from PyQt5.QtWidgets import QSlider, QMainWindow, QGridLayout, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QPushButton, QFileDialog
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtMultimedia import QMediaContent
 from PyQt5.QtGui import QPixmap, QImage, QIcon
-
 from decord import VideoReader, cpu, gpu
+
+import DropletDetection
+from Ui_Progress import Ui_Progress
 
 class FrameView(QWidget):
     def __init__(self):
@@ -83,11 +83,11 @@ class Ui_VideoAnalysis(QMainWindow):
         optionButtons.addWidget(self.setEndButton)
 
         self.analyzeButton = self.AddButton(f"Analyze")
-        self.analyzeButton.clicked.connect(lambda: DropletDetection.Analyze(self.filename, self.startTime, self.endTime))
+        self.analyzeButton.clicked.connect(self.BeginAnalysis)
         self.analyzeButton.setStyleSheet(
             """
             background-color: #6edbcc;
-            color: #eeeeee;
+            color: #ffffff;
             border-radius: 25px;
             font-size: 18px;
             font-weight: bold;
@@ -133,10 +133,10 @@ class Ui_VideoAnalysis(QMainWindow):
         return pushButton
 
     def CreateFrameSlider(self):
-        videoDuration = len(VideoReader(f"{self.filename}", ctx=cpu(0))) - 1
+        self.videoDuration = len(VideoReader(f"{self.filename}", ctx=cpu(0))) - 1
         self.frameSlider = QSlider(QtCore.Qt.Horizontal, self)
         self.frameSlider.sliderReleased.connect(lambda: self.GoToFrame(self.frameSlider.value()))
-        self.frameSlider.setRange(0, videoDuration)
+        self.frameSlider.setRange(0, self.videoDuration)
         self.frameSlider.setStyleSheet(
             """
             QSlider::groove:horizontal{
@@ -152,6 +152,14 @@ class Ui_VideoAnalysis(QMainWindow):
             }
             """
         )
+
+    def BeginAnalysis(self):
+        output = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Destination')
+        # print(output)
+        # DropletDetection.Analyze(self.filename, self.startTime, self.endTime)
+        self.Progress = Ui_Progress(self.filename, self.startTime, self.endTime)
+        self.hide()
+        self.Progress.show()
 
     def CloseWindow(self):
         self.close()
